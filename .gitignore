@@ -1,0 +1,5 @@
+# .gitignore
+/anvil
+/anvil-linux
+*.exe
+.DS_Store
