@@ -41,8 +41,13 @@ var startCmd = &cobra.Command{
 		defer cli.Close()
 
 		if detected.Linger != nil && !*detected.Linger {
-			fmt.Fprintln(cmd.ErrOrStderr(), "warning: linger is disabled; the server will die on logout")
-			fmt.Fprintln(cmd.ErrOrStderr(), "  loginctl enable-linger $USER")
+			fmt.Fprintln(cmd.ErrOrStderr(), "enabling linger so the server survives logout")
+			if err := engine.EnableLinger(); err != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "warning: %v\n", err)
+			} else {
+				yes := true
+				detected.Linger = &yes
+			}
 		}
 
 		app, err := config.LoadApp(paths.AppConfig)
