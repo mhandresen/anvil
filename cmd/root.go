@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/mhandresen/anvil/internal/engine"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -32,6 +32,7 @@ func init() {
 	rootCmd.AddCommand(stopCmd)
 	rootCmd.AddCommand(logsCmd)
 	rootCmd.AddCommand(joinCmd)
+	rootCmd.AddCommand(tunnelCmd)
 }
 
 func Execute() {
