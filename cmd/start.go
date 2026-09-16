@@ -34,11 +34,16 @@ var startCmd = &cobra.Command{
 			return fmt.Errorf("unknown server %s", id)
 		}
 
-		cli, _, err := openEngine(cmd.Context())
+		cli, detected, err := openEngine(cmd.Context())
 		if err != nil {
 			return err
 		}
 		defer cli.Close()
+
+		if detected.Linger != nil && !*detected.Linger {
+			fmt.Fprintln(cmd.ErrOrStderr(), "warning: linger is disabled; the server will die on logout")
+			fmt.Fprintln(cmd.ErrOrStderr(), "  loginctl enable-linger $USER")
+		}
 
 		app, err := config.LoadApp(paths.AppConfig)
 		if err != nil {
@@ -77,6 +82,11 @@ var startCmd = &cobra.Command{
 				return err
 			}
 			bind := dataDir + ":/data"
+			if detected.SELinux == "enforcing" &&
+				(detected.Mode == engine.ModeRootlessPodman ||
+					detected.Mode == engine.ModeSystemPodman) {
+				bind += ":Z"
+			}
 			publish := !srv.Public
 			if srv.PublishToHost != nil {
 				publish = *srv.PublishToHost
